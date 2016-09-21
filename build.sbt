@@ -61,6 +61,21 @@ lazy val formatSettings = SbtScalariform.scalariformSettings ++ Seq(
     .setPreference(SpacesWithinPatternBinders, true)
 )
 
+lazy val integrationTestArgument: Tests.Argument = {
+  var args = Seq("-n", "mesosphere.marathon.IntegrationTest")
+
+  // FIXME (gkleiman): Docker tests don't work under Docker Machine yet. So they can be disabled through an env variable.
+  if (sys.env.getOrElse("RUN_DOCKER_INTEGRATION_TESTS", "false") != "true") {
+    args = args ++ Seq("-l", "mesosphere.marathon.DockerIntegrationTest")
+  }
+
+  if (sys.env.getOrElse("RUN_MESOS_INTEGRATION_TESTS", "false") != "true") {
+    args = args ++ Seq("-l", "mesosphere.marathon.MesosIntegrationTest")
+  }
+
+  Tests.Argument(args:_*)
+}
+
 lazy val commonSettings = inConfig(IntegrationTest)(Defaults.testTasks) ++ Seq(
   autoCompilerPlugins := true,
   organization := "mesosphere.marathon",
@@ -112,7 +127,7 @@ lazy val commonSettings = inConfig(IntegrationTest)(Defaults.testTasks) ++ Seq(
   fork in Test := true,
 
   fork in IntegrationTest := true,
-  testOptions in IntegrationTest := Seq(formattingTestArg, Tests.Argument("-n", "mesosphere.marathon.IntegrationTest")),
+  testOptions in IntegrationTest := Seq(formattingTestArg, integrationTestArgument),
   parallelExecution in IntegrationTest := false,
   testForkedParallel in IntegrationTest := false,
   testListeners in IntegrationTest := Seq(new JUnitXmlTestsListener((target.value / "test-reports" / "integration").getAbsolutePath)),
