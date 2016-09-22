@@ -1,11 +1,12 @@
 package mesosphere.marathon.integration.setup
 
+import mesosphere.marathon.core.pod.{HostNetwork, MesosContainer, PodDefinition}
 import mesosphere.marathon.integration.facades.MarathonFacade._
 import mesosphere.marathon.integration.setup.ProcessKeeper.MesosConfig
-import mesosphere.marathon.raml.Resources
-import mesosphere.marathon.state.{ AppDefinition, Container }
+import mesosphere.marathon.raml
+import mesosphere.marathon.state.{AppDefinition, Container}
 import org.scalactic.source.Position
-import org.scalatest.{ BeforeAndAfter, GivenWhenThen, Matchers, Tag }
+import org.scalatest.{BeforeAndAfter, GivenWhenThen, Matchers, Tag}
 
 /**
   * All integration tests that use the Mesos containerizer with Docker images should be marked with this tag.
@@ -42,7 +43,7 @@ class MesosAppIntegrationTest
       id = testBasePath / "mesosdockerapp",
       cmd = Some("sleep 600"),
       container = Some(Container.MesosDocker(image = "busybox")),
-      resources = Resources(cpus = 0.2, mem = 16.0),
+      resources = raml.Resources(cpus = 0.2, mem = 16.0),
       instances = 1
     )
 
@@ -54,5 +55,30 @@ class MesosAppIntegrationTest
     extractDeploymentIds(result) should have size 1
     waitForEvent("deployment_success")
     waitForTasks(app.id, 1) // The app has really started
+  }
+
+  test("deploy a simple pod") {
+    Given("a pod with a single task")
+    val pod = PodDefinition(
+      id = testBasePath / "pod",
+      containers = scala.collection.immutable.Seq(
+        MesosContainer(
+          name = "task1",
+          exec = Some(raml.MesosExec(raml.ShellCommand("sleep 1000"))),
+          resources = raml.Resources(cpus = 0.1, mem = 32.0)
+        )
+      ),
+      networks = scala.collection.immutable.Seq(HostNetwork),
+      instances = 1
+    )
+
+    When("The pod is deployed")
+    val result = marathon.createPodV2(pod)
+
+    Then("The pod is created")
+    result.code should be(201) // Created
+    //extractDeploymentIds(result) should have size 1 // TODO(PODS)
+    waitForEvent("deployment_success")
+    //waitForTasks(pod.id, 1) // The pod has really started // TODO(PODS)
   }
 }
