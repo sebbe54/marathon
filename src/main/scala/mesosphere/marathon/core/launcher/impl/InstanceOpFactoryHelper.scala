@@ -45,12 +45,12 @@ class InstanceOpFactoryHelper(
 
   def launchOnReservation(
     taskInfo: Mesos.TaskInfo,
-    newTask: InstanceUpdateOperation.LaunchOnReservation,
-    oldTask: Task.Reserved): InstanceOp.LaunchTask = {
+    newState: InstanceUpdateOperation.LaunchOnReservation,
+    oldState: Task.Reserved): InstanceOp.LaunchTask = {
 
     def createOperations = Seq(offerOperationFactory.launch(taskInfo))
 
-    InstanceOp.LaunchTask(taskInfo, newTask, Some(Instance(oldTask)), createOperations)
+    InstanceOp.LaunchTask(taskInfo, newState, Some(Instance(oldState)), createOperations)
   }
 
   /**
@@ -59,17 +59,17 @@ class InstanceOpFactoryHelper(
     */
   def reserveAndCreateVolumes(
     frameworkId: FrameworkId,
-    newTask: InstanceUpdateOperation.Reserve,
+    newState: InstanceUpdateOperation.Reserve,
     resources: Iterable[Mesos.Resource],
     localVolumes: Iterable[(DiskSource, LocalVolume)]): InstanceOp.ReserveAndCreateVolumes = {
 
     def createOperations = Seq(
-      offerOperationFactory.reserve(frameworkId, newTask.instanceId, resources),
+      offerOperationFactory.reserve(frameworkId, newState.instanceId, resources),
       offerOperationFactory.createVolumes(
         frameworkId,
-        newTask.instanceId,
+        newState.instanceId,
         localVolumes))
 
-    InstanceOp.ReserveAndCreateVolumes(newTask, resources, createOperations)
+    InstanceOp.ReserveAndCreateVolumes(newState, resources, createOperations)
   }
 }

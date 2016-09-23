@@ -34,6 +34,7 @@ case class Instance(
 
   // TODO(PODS): check consumers of this def and see if they can use the map instead
   val tasks = tasksMap.values
+  // TODO(PODS): make this a case class ctor argument and move out of Instance.Status
   val runSpecVersion: Timestamp = state.version
   val runSpecId: PathId = instanceId.runSpecId
   val isLaunched: Boolean = tasksMap.valuesIterator.forall(task => task.launched.isDefined)
@@ -86,7 +87,8 @@ case class Instance(
               val updated = this.copy(
                 state = state.copy(
                   status = InstanceStatus.Staging,
-                  since = timestamp
+                  since = timestamp,
+                  version = version
                 ),
                 tasksMap = tasksMap.updated(task.taskId, updatedTask)
               )
