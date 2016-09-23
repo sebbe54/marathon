@@ -73,7 +73,7 @@ class ResidentTaskIntegrationTest
   }
 
   // OK
-  test("persistent volume will be re-attached and keep state") { f =>
+  ignore("persistent volume will be re-attached and keep state") { f =>
     Given("An app that writes into a persistent volume")
     val containerPath = "persistent-volume"
     val app = f.residentApp(
@@ -111,7 +111,7 @@ class ResidentTaskIntegrationTest
     waitForStatusUpdates(StatusUpdate.TASK_FINISHED)
   }
 
-  // TODO(PODS) BLOCKER: reenable this test
+  // OK
   ignore("resident task is launched completely on reserved resources") { f =>
     Given("A resident app")
     val app = f.residentApp(portDefinitions = Seq.empty /* prevent problems by randomized port assignment */ )
@@ -147,7 +147,7 @@ class ResidentTaskIntegrationTest
     // we should test that here
   }
 
-  // TODO(PODS) BLOCKER: reenable this test
+  // OK
   ignore("Scale Up") { f =>
     Given("A resident app with 0 instances")
     val app = f.createSuccessfully(f.residentApp(instances = 0))
@@ -159,7 +159,7 @@ class ResidentTaskIntegrationTest
     f.launchedTasks(app.id).size shouldBe 5
   }
 
-  // TODO(PODS) BLOCKER: reenable this test
+  // OK
   ignore("Scale Down") { f =>
     Given("a resident app with 5 instances")
     val app = f.createSuccessfully(f.residentApp(instances = 5))
@@ -175,7 +175,7 @@ class ResidentTaskIntegrationTest
   }
 
   // TODO(PODS) BLOCKER: reenable this test
-  ignore("Restart") { f =>
+  test("Restart") { f =>
     Given("a resident app with 5 instances")
     val app = f.createSuccessfully(
       f.residentApp(

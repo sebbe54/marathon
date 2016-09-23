@@ -174,7 +174,9 @@ trait SingleMarathonIntegrationTest
 
   def waitForTasks(appId: PathId, num: Int, maxWait: FiniteDuration = 30.seconds): List[ITEnrichedTask] = {
     def checkTasks: Option[List[ITEnrichedTask]] = {
-      val tasks = Try(marathon.tasks(appId)).map(_.value).getOrElse(Nil).filter(_.launched)
+      val result = marathon.tasks(appId)
+      val tasks = Try(result).map(_.value).getOrElse(Nil).filter(_.launched)
+      println(s">>>>>>>>>>> MOHMIAU $result -> $tasks")
       if (tasks.size == num) Some(tasks) else None
     }
     WaitTestSupport.waitFor(s"$num tasks to launch", maxWait)(checkTasks)

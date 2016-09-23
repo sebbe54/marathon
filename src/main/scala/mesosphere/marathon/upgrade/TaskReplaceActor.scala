@@ -75,6 +75,7 @@ class TaskReplaceActor(
 
     // Old instance successfully killed
     case InstanceChanged(id, _, `pathId`, Terminal(_), instance) if oldInstanceIds(id) =>
+      log.info(s">>>>> old instance terminal: ${instance.state.status}")
       oldInstanceIds -= id
       outstandingKills -= id
       reconcileNewInstances()
@@ -120,10 +121,10 @@ class TaskReplaceActor(
       log.info(s"All new instances for $pathId are ready and all old instances have been killed")
       promise.success(())
       context.stop(self)
-    } else if (log.isDebugEnabled) {
-      log.debug(s"For run spec: [${runSpec.id}] there are [${healthyInstances.size}] healthy and " +
+    } else if (log.isInfoEnabled) {
+      log.info(s"For run spec: [${runSpec.id}] there are [${healthyInstances.size}] healthy and " +
         s"[${readyInstances.size}] ready new instances and " +
-        s"[${oldInstanceIds.size}] old instances.")
+        s"[${oldInstanceIds.size}] old instances: ${oldInstanceIds.mkString(",")}.")
     }
   }
 }
