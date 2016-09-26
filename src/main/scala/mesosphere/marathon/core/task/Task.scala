@@ -493,7 +493,8 @@ object Task {
           reservation = reservation.copy(state = Task.Reservation.State.Suspended(timeout = None)),
           status = status.copy(
             mesosStatus = Some(mesosStatus),
-            taskStatus = newStatus
+            // Note the task needs to transition to Reserved, otherwise the instance will not transition to Reserved
+            taskStatus = InstanceStatus.Reserved
           )
         )
         TaskUpdateEffect.Update(updatedTask)

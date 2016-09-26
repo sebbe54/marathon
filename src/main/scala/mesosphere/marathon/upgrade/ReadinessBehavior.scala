@@ -97,8 +97,6 @@ trait ReadinessBehavior { this: Actor with ActorLogging =>
       }
       def instanceIsRunning(instanceFn: Instance => Unit): Receive = {
         case InstanceChanged(_, `version`, `pathId`, Running, instance) => instanceFn(instance)
-        //        case event: InstanceChanged =>
-        //          log.info(s">>> NO MATCH: ${event.runSpecId} ${event.status} ${event.runSpecVersion} - looking for $pathId $version $Running")
       }
       instanceIsRunning(
         if (runSpec.readinessChecks.isEmpty) markAsHealthyAndReady else markAsHealthyAndInitiateReadinessCheck)

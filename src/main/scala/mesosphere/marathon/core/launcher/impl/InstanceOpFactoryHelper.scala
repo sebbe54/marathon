@@ -24,6 +24,7 @@ class InstanceOpFactoryHelper(
 
     def createOperations = Seq(offerOperationFactory.launch(taskInfo))
 
+    // TODO(PODS): pass in an instance to get rid of Instance(newTask)
     val stateOp = InstanceUpdateOperation.LaunchEphemeral(Instance(newTask))
     InstanceOp.LaunchTask(taskInfo, stateOp, oldInstance = None, createOperations)
   }
@@ -50,6 +51,7 @@ class InstanceOpFactoryHelper(
 
     def createOperations = Seq(offerOperationFactory.launch(taskInfo))
 
+    // TODO(PODS): pass in an instance to get rif of Instance(oldState)
     InstanceOp.LaunchTask(taskInfo, newState, Some(Instance(oldState)), createOperations)
   }
 

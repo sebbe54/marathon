@@ -80,6 +80,7 @@ case class Instance(
         if (this.isReserved) {
           require(tasksMap.size == 1, "Residency is not yet implemented for task groups")
 
+          // TODO(PODS): make this work for taskGroups
           val task = tasksMap.values.head
           val taskEffect = task.update(TaskUpdateOperation.LaunchOnReservation(runSpecVersion, status, hostPorts))
           taskEffect match {
