@@ -9,12 +9,13 @@ FROM java:8-jdk
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv E56151BF && \
     echo "deb http://repos.mesosphere.com/debian jessie-testing main" | tee /etc/apt/sources.list.d/mesosphere.list && \
     echo "deb http://repos.mesosphere.com/debian jessie main" | tee -a /etc/apt/sources.list.d/mesosphere.list && \
+    eval $(sed -n s/mesos.version/MESOS_VERSION/p </marathon/project/build.properties) && \
     apt-get update && \
-    apt-get install --no-install-recommends -y --force-yes mesos=1.0.0-2.0.89.debian81
+    apt-get install --no-install-recommends -y --force-yes mesos=$MESOS_VERSION.debian81
 
 # Install sbt manually
 COPY ./project/build.properties /marathon/project/build.properties
-RUN eval $(sed s/sbt.version/SBT_VERSION/ </marathon/project/build.properties) && \
+RUN eval $(sed -n s/sbt.version/SBT_VERSION/p </marathon/project/build.properties) && \
     mkdir -p /usr/local/bin && \
     wget -P /usr/local/bin/ https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/$SBT_VERSION/sbt-launch.jar
 COPY project/sbt /usr/local/bin/

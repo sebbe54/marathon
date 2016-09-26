@@ -15,10 +15,11 @@ WORKDIR /marathon
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv E56151BF && \
     echo "deb http://repos.mesosphere.com/debian jessie-testing main" | tee -a /etc/apt/sources.list.d/mesosphere.list && \
     echo "deb http://repos.mesosphere.com/debian jessie main" | tee -a /etc/apt/sources.list.d/mesosphere.list && \
+    eval $(sed -n s/mesos.version/MESOS_VERSION/p </marathon/project/build.properties) && \
     apt-get update && \
-    apt-get install --no-install-recommends -y --force-yes mesos=1.0.0-2.0.89.debian81 && \
+    apt-get install --no-install-recommends -y --force-yes mesos=$MESOS_VERSION.debian81 && \
     apt-get clean && \
-    eval $(sed s/sbt.version/SBT_VERSION/ </marathon/project/build.properties) && \
+    eval $(sed -n s/sbt.version/SBT_VERSION/p </marathon/project/build.properties) && \
     mkdir -p /usr/local/bin && \
     wget -P /usr/local/bin/ http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/$SBT_VERSION/sbt-launch.jar && \
     cp /marathon/project/sbt /usr/local/bin && chmod +x /usr/local/bin/sbt && \
